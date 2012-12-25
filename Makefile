@@ -3,7 +3,7 @@
 
 include config.mk
 
-SRC = syntog.c
+SRC = util.c syntog.c
 OBJ = ${SRC:.c=.o}
 
 all: options syntog

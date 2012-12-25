@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,28 +6,21 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XInput.h>
 
+#include "arg.h"
+#include "util.h"
+
 /* function declaration */
-static void die(const char *errstr, ...);
 static void run();
 static void setup();
 static void usage();
 
 /* variables */
+char *argv0;
+static Atom prop;
 static Display *dpy;
 static XDevice *dev;
-static Atom prop;
 
 /* function implementations */
-void
-die(const char *errstr, ...) {
-	va_list ap;
-
-	va_start(ap, errstr);
-	vfprintf(stderr, errstr, ap);
-	va_end(ap);
-	exit(EXIT_FAILURE);
-}
-
 void
 run() {
 	Atom type;
@@ -85,16 +79,18 @@ setup() {
 
 void
 usage() {
-	fprintf(stderr, "usage: syntog [-v]\n");
-	exit(EXIT_FAILURE);
+	die("usage: %s -v\n", basename(argv0));
 }
 
 int
-main(int argc, char **argv) {
-	if((argc == 2) && !strcmp("-v", argv[1]))
-		die("syntog-%s, © 2012 Peter A. Shevtsov\n", VERSION);
-	else if(argc != 1)
+main(int argc, char *argv[]) {
+	ARGBEGIN {
+	case 'v':
+		die("syntog-"VERSION", © 2012 Peter A. Shevtsov"
+				", see LICENSE for details.\n");
+	default:
 		usage();
+	} ARGEND;
 	if(!(dpy = XOpenDisplay(NULL))) {
 		die("syntog: cannot open display\n");
 	}
